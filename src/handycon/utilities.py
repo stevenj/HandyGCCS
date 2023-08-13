@@ -262,7 +262,7 @@ def map_config():
     }
     handycon.power_action = POWER_ACTION_MAP[handycon.config["Button Map"]["power_button"]][0]
 
-    handycon.turbo = turbo_handler(handycon.config.get("turbo",{})
+    handycon.turbo = turbo_handler(handycon.config.get("turbo",{}))
 
 
 

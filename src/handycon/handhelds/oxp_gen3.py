@@ -20,10 +20,15 @@ def init_handheld(handheld_controller):
     handycon.GAMEPAD_NAME = 'Microsoft X-Box 360 pad'
     handycon.KEYBOARD_ADDRESS = 'isa0060/serio0/input0'
     handycon.KEYBOARD_NAME = 'AT Translated Set 2 keyboard'
-    if os.path.exists('/sys/devices/platform/oxp-platform/tt_toggle'):
-        command = f'echo 1 > /sys/devices/platform/oxp-platform/tt_toggle'
+
+    # See if we need to capture the Turbo button
+    tt_toggle = '/sys/devices/platform/oxp-platform/tt_toggle'
+    if handycon.turbo.capture() and os.path.exists(tt_toggle):
+        command = f'echo 1 > {tt_toggle}'
         run = os.popen(command, 'r', 1).read().strip()
         handycon.logger.info(f'Turbo button takeover enabled')
+        # Setup the turbo handler default settings.
+        handycon.turbo.set_turbo()
 
 
 # Captures keyboard events and translates them to virtual device events.
@@ -45,7 +50,7 @@ async def process_event(seed_event, active_keys):
     if seed_event.code in [e.KEY_VOLUMEDOWN, e.KEY_VOLUMEUP]:
         await handycon.emit_events([seed_event])
 
-    # Handle missed keys. 
+    # Handle missed keys.
     if active_keys == [] and handycon.event_queue != []:
         this_button = handycon.event_queue[0]
 
@@ -56,6 +61,7 @@ async def process_event(seed_event, active_keys):
         this_button = button1
 
     # BUTTON 2 (Default: QAM) Turbo Button
+    # This event won't fire if turbo was not captured
     #if active_keys == [34, 125] and button_on == 1 and button2 not in handycon.event_queue:
     if active_keys == [29, 56, 125] and button_on == 1 and button2 not in handycon.event_queue:
         handycon.event_queue.append(button2)

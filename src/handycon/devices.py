@@ -233,45 +233,7 @@ async def capture_keyboard_events():
                         handycon.logger.debug("No active events.")
 
                     # Capture keyboard events and translate them to mapped events.
-                    match handycon.system_type:
-                        case "ALY_GEN1":
-                            await ally_gen1.process_event(seed_event, active_keys)
-                        case "ANB_GEN1":
-                            await anb_gen1.process_event(seed_event, active_keys)
-                        case "AOK_GEN1":
-                            await aok_gen1.process_event(seed_event, active_keys)
-                        case "AOK_GEN2":
-                            await aok_gen2.process_event(seed_event, active_keys)
-                        case "AYA_GEN1":
-                            await aya_gen1.process_event(seed_event, active_keys)
-                        case "AYA_GEN2":
-                            await aya_gen2.process_event(seed_event, active_keys)
-                        case "AYA_GEN3":
-                            await aya_gen3.process_event(seed_event, active_keys)
-                        case "AYA_GEN4":
-                            await aya_gen4.process_event(seed_event, active_keys)
-                        case "AYA_GEN5":
-                            await aya_gen5.process_event(seed_event, active_keys)
-                        case "AYA_GEN6":
-                            await aya_gen6.process_event(seed_event, active_keys)
-                        case "AYA_GEN7":
-                            await aya_gen7.process_event(seed_event, active_keys)
-                        case "AYN_GEN1":
-                            await ayn_gen1.process_event(seed_event, active_keys)
-                        case "GPD_GEN1":
-                            await gpd_gen1.process_event(seed_event, active_keys)
-                        case "GPD_GEN2":
-                            await gpd_gen2.process_event(seed_event, active_keys)
-                        case "GPD_GEN3":
-                            await gpd_gen3.process_event(seed_event, active_keys)
-                        case "OXP_GEN1":
-                            await oxp_gen1.process_event(seed_event, active_keys)
-                        case "OXP_GEN2":
-                            await oxp_gen2.process_event(seed_event, active_keys)
-                        case "OXP_GEN3":
-                            await oxp_gen3.process_event(seed_event, active_keys)
-                        case "OXP_GEN4":
-                            await oxp_gen3.process_event(seed_event, active_keys)
+                    handycon.system_handler.process_event(seed_event, active_keys)
 
             except Exception as err:
                 handycon.logger.error(f"{err} | Error reading events from {handycon.keyboard_device.name}")
@@ -449,7 +411,7 @@ async def capture_ff_events():
             except IOError as err:
                 handycon.logger.error(f"{err} | Error uploading effect {effect.id}.")
                 upload.retval = -1
-            
+
             handycon.ui_device.end_upload(upload)
 
         elif event.code == e.UI_FF_ERASE:
@@ -505,7 +467,7 @@ async def emit_now(seed_event, event_list, value):
 
     # Ignore malformed requests
     if not event_list:
-        handycon.logger.error("emit_now received malfirmed event_list. No action") 
+        handycon.logger.error("emit_now received malfirmed event_list. No action")
         return
 
     # Handle string events
@@ -523,7 +485,7 @@ async def emit_now(seed_event, event_list, value):
                 handycon.logger.debug("Toggle Mouse Mode is not currently enabled")
             case "Toggle Performance":
                 handycon.logger.debug("Toggle Performance")
-                await toggle_performance()
+                await handycon.turbo.toggle()
             case "Hibernate", "Suspend", "Shutdown":
                 handycon.logger.error(f"Power mode {event_list[0]} set to button action. Check your configuration file.")
             case _:

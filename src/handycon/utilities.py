@@ -212,6 +212,9 @@ se run the capture-system.py utility found on the GitHub repository and upload \
  file with your issue.")
         sys.exit(0)
 
+    # So that we can use the config during init, we need to get it BEFORE we init the handheld.
+    get_config()
+
     handycon.system_handler.init_handheld(handycon)
     handycon.logger.info(f"Identified host system as {system_id} and configured defaults for {handycon.system_type}.")
 

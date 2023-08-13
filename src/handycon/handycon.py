@@ -87,7 +87,6 @@ class HandheldController:
         utilities.get_user()
         self.HAS_CHIMERA_LAUNCHER=os.path.isfile(CHIMERA_LAUNCHER_PATH)
         utilities.id_system()
-        utilities.get_config()
         devices.make_controller()
 
         # Run asyncio loop to capture all events.

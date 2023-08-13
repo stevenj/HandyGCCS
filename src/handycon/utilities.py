@@ -274,6 +274,8 @@ def map_config():
 
 
 
+
+
 # Sets the default configuration.
 def set_default_config():
     global handycon
@@ -294,6 +296,8 @@ def set_default_config():
             }
 
     handycon.config["Turbo"] = turbo_handler.get_default_config()
+
+    handycon.logger.info(f"config: {handycon.config}")
 
 
 # Writes current config to disk.

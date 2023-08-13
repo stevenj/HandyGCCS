@@ -265,7 +265,12 @@ def map_config():
     }
     handycon.power_action = POWER_ACTION_MAP[handycon.config["Button Map"]["power_button"]][0]
 
-    handycon.turbo = turbo_handler(handycon.config.get("turbo",{}))
+    try:
+        turbo_cfg = handycon.config["Turbo"]
+    except:
+        turbo_cfg = turbo_handler.get_default_config()
+
+    handycon.turbo = turbo_handler(turbo_cfg)
 
 
 
@@ -365,7 +370,7 @@ class turbo_handler:
             "capture": True,
             # Default emulates existing TOGGLE_PERFORMANCE Behaviour
             "speeds" : { # Only used for toggle mode.  Will start at default, and step through the numbered keys, in order.
-                0: {
+               "0": {
                     "command": [
                         "ryzenadj --power-saving",
                         "cpupower frequency-set -g powersave",
@@ -377,7 +382,7 @@ class turbo_handler:
                     "rumble": 1,
                     "default" : True,
                 },
-                1: {
+                "1": {
                     "command": [
                         "ryzenadj --max-performance",
                         "cpupower frequency-set -g performance",

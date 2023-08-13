@@ -31,22 +31,22 @@ async def process_event(seed_event, active_keys):
     # Button map shortcuts for easy reference.
     button1 = handycon.button_map["button1"]  # Default Screenshot
     button2 = handycon.button_map["button2"]  # Default QAM
-    button3 = handycon.button_map["button3"]  # Default ESC 
+    button3 = handycon.button_map["button3"]  # Default ESC
     button4 = handycon.button_map["button4"]  # Default OSK
     button5 = handycon.button_map["button5"]  # Default MODE
-    button6 = handycon.button_map["button6"] 
-    button7 = handycon.button_map["button7"] 
-    button8 = handycon.button_map["button8"] 
-    button9 = handycon.button_map["button9"] 
-    button10 = handycon.button_map["button10"] 
-    button11 = handycon.button_map["button11"] 
-    button12 = handycon.button_map["button12"] 
+    button6 = handycon.button_map["button6"]
+    button7 = handycon.button_map["button7"]
+    button8 = handycon.button_map["button8"]
+    button9 = handycon.button_map["button9"]
+    button10 = handycon.button_map["button10"]
+    button11 = handycon.button_map["button11"]
+    button12 = handycon.button_map["button12"]
 
     ## Loop variables
     button_on = seed_event.value
     this_button = None
 
-    # Handle missed keys. 
+    # Handle missed keys.
     if active_keys == [] and handycon.event_queue != []:
         this_button = handycon.event_queue[0]
 
@@ -143,3 +143,17 @@ async def process_event(seed_event, active_keys):
     elif handycon.last_button and not this_button:
         await handycon.emit_now(seed_event, handycon.last_button, 0)
         handycon.last_button = None
+
+def get_powersave_config() -> list[str]:
+    # Get the default powersave setting for this device.
+    return [
+        "ryzenadj --power-saving",
+        "echo 0 > /sys/devices/platform/asus-nb-wmi/throttle_thermal_policy",
+    ]
+
+def get_performance_config() -> list[str]:
+    # Get the default performance setting for this device.
+    return [
+        "ryzenadj --max-performance",
+        "echo 1 > /sys/devices/platform/asus-nb-wmi/throttle_thermal_policy",
+    ]

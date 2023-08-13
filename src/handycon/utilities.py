@@ -409,8 +409,9 @@ class turbo_handler:
                 self.default = speed
                 break
 
-    def get_default_config(self) -> dict:
-        cfg = self.DEFAULT_CONFIG
+    @classmethod
+    def get_default_config(cls) -> dict:
+        cfg = cls.DEFAULT_CONFIG
 
         # Override defaults for Powersave and Performance if we know a better set for a particular device.
         try:

@@ -38,6 +38,7 @@ class HandheldController:
     power_action = "Suspend"
     running = False
     shutdown = False
+    turbo = None
 
     # Handheld Config
     BUTTON_DELAY = 0.00
@@ -73,10 +74,6 @@ class HandheldController:
     keyboard_2_event = None
     keyboard_2_path = None
 
-    # Performance settings
-    performance_mode = "--power-saving"
-    thermal_mode = "0"
-
     def __init__(self):
         self.running = True
         devices.set_handycon(self)
@@ -86,7 +83,7 @@ class HandheldController:
             self.logger.warn("Detected an OpenGamepadUI Process. Input management not possible. Exiting.")
             exit()
         Path(HIDE_PATH).mkdir(parents=True, exist_ok=True)
-        devices.restore_hidden() 
+        devices.restore_hidden()
         utilities.get_user()
         self.HAS_CHIMERA_LAUNCHER=os.path.isfile(CHIMERA_LAUNCHER_PATH)
         utilities.id_system()

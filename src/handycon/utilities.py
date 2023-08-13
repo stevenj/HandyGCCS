@@ -9,6 +9,7 @@ import os
 import re
 import subprocess
 import sys
+from . import devices
 
 ## Local modules
 import handycon.handhelds.ally_gen1 as ally_gen1
@@ -74,20 +75,20 @@ def id_system():
             "Win600",
             ):
         handycon.system_type = "ANB_GEN1"
-        anb_gen1.init_handheld(handycon)
+        handycon.system_handler = anb_gen1
 
     ## AOKZOE Devices
     elif system_id in (
         "AOKZOE A1 AR07",
         ):
         handycon.system_type = "AOK_GEN1"
-        aok_gen1.init_handheld(handycon)
+        handycon.system_handler = aok_gen1
 
     elif system_id in (
         "AOKZOE A1 Pro",
         ):
         handycon.system_type = "AOK_GEN2"
-        aok_gen2.init_handheld(handycon)
+        handycon.system_handler = aok_gen2
 
 
     ## ASUS Devices
@@ -95,7 +96,7 @@ def id_system():
         "ROG Ally RC71L_RC71L",
         ):
         handycon.system_type = "ALY_GEN1"
-        ally_gen1.init_handheld(handycon)
+        handycon.system_handler = ally_gen1
 
     ## Aya Neo Devices
     elif system_id in (
@@ -106,7 +107,7 @@ def id_system():
         "AYANEO 2021 Pro Retro Power",
         ):
         handycon.system_type = "AYA_GEN1"
-        aya_gen1.init_handheld(handycon)
+        handycon.system_handler = aya_gen1
 
     elif system_id in (
         "NEXT",
@@ -117,31 +118,31 @@ def id_system():
         "AYANEO NEXT Advance",
         ):
         handycon.system_type = "AYA_GEN2"
-        aya_gen2.init_handheld(handycon)
+        handycon.system_handler = aya_gen2
 
     elif system_id in (
         "AIR",
         "AIR Pro",
         ):
         handycon.system_type = "AYA_GEN3"
-        aya_gen3.init_handheld(handycon)
+        handycon.system_handler = aya_gen3
 
     elif system_id in (
         "AYANEO 2",
         "GEEK",
         ):
         handycon.system_type = "AYA_GEN4"
-        aya_gen4.init_handheld(handycon)
+        handycon.system_handler = aya_gen4
 
     elif system_id in (
         "AIR Plus",
         ):
         if cpu_vendor == "GenuineIntel":
             handycon.system_type = "AYA_GEN7"
-            aya_gen7.init_handheld(handycon)
+            handycon.system_handler = aya_gen7
         else:
             handycon.system_type = "AYA_GEN5"
-            aya_gen5.init_handheld(handycon)
+            handycon.system_handler = aya_gen5
 
     elif system_id in (
         "AYANEO 2S",
@@ -149,14 +150,14 @@ def id_system():
         "AIR 1S",
         ):
         handycon.system_type = "AYA_GEN6"
-        aya_gen6.init_handheld(handycon)
+        handycon.system_handler = aya_gen6
 
     ## Ayn Devices
     elif system_id in (
             "Loki Max",
         ):
         handycon.system_type = "AYN_GEN1"
-        ayn_gen1.init_handheld(handycon)
+        handycon.system_handler = ayn_gen1
 
     ## GPD Devices.
     # Have 2 buttons with 3 modes (left, right, both)
@@ -164,19 +165,19 @@ def id_system():
         "G1618-03", #Win3
         ):
         handycon.system_type = "GPD_GEN1"
-        gpd_gen1.init_handheld(handycon)
+        handycon.system_handler = gpd_gen1
 
     elif system_id in (
         "G1619-04", #WinMax2
         ):
         handycon.system_type = "GPD_GEN2"
-        gpd_gen2.init_handheld(handycon)
+        handycon.system_handler = gpd_gen2
 
     elif system_id in (
         "G1618-04", #Win4
         ):
         handycon.system_type = "GPD_GEN3"
-        gpd_gen3.init_handheld(handycon)
+        handycon.system_handler = gpd_gen3
 
 ## ONEXPLAYER and AOKZOE devices.
     # BIOS have inlete DMI data and most models report as "ONE XPLAYER" or "ONEXPLAYER".
@@ -186,22 +187,22 @@ def id_system():
         ):
         if cpu_vendor == "GenuineIntel":
             handycon.system_type = "OXP_GEN1"
-            oxp_gen1.init_handheld(handycon)
+            handycon.system_handler = oxp_gen1
         else:
             handycon.system_type = "OXP_GEN2"
-            oxp_gen2.init_handheld(handycon)
+            handycon.system_handler = oxp_gen2
 
     elif system_id in (
         "ONEXPLAYER mini A07",
         ):
         handycon.system_type = "OXP_GEN3"
-        oxp_gen3.init_handheld(handycon)
+        handycon.system_handler = oxp_gen3
 
     elif system_id in (
         "ONEXPLAYER Mini Pro",
         ):
         handycon.system_type = "OXP_GEN4"
-        oxp_gen4.init_handheld(handycon)
+        handycon.system_handler = oxp_gen4
 
     # Block devices that aren't supported as this could cause issues.
     else:
@@ -210,6 +211,8 @@ ub at https://github.ShadowBlip/HandyGCCS if this is a bug. If possible, \
 se run the capture-system.py utility found on the GitHub repository and upload \
  file with your issue.")
         sys.exit(0)
+
+    handycon.system_handler.init_handheld(handycon)
     handycon.logger.info(f"Identified host system as {system_id} and configured defaults for {handycon.system_type}.")
 
 
@@ -240,7 +243,7 @@ def get_config():
     map_config()
 
 
-# Match runtime variables to the config 
+# Match runtime variables to the config
 def map_config():
     # Assign config file values
     handycon.button_map = {
@@ -258,6 +261,9 @@ def map_config():
     "button12": EVENT_MAP[handycon.config["Button Map"]["button12"]],
     }
     handycon.power_action = POWER_ACTION_MAP[handycon.config["Button Map"]["power_button"]][0]
+
+    handycon.turbo = turbo_handler(handycon.config,get("turbo",{})]
+
 
 
 # Sets the default configuration.
@@ -278,6 +284,8 @@ def set_default_config():
             "button12": "TOGGLE_GYRO",
             "power_button": "SUSPEND",
             }
+
+    handycon.config["Turbo"] = turbo_handler.get_default_config()
 
 
 # Writes current config to disk.
@@ -315,7 +323,7 @@ def steam_ifrunning_deckui(cmd):
             steam_cmd = f.read()
     except Exception as err:
         handycon.logger.error(f"{err} | Error getting steam cmdline.")
-        return False 
+        return False
 
     # Use this andline to determine if Steam is running in DeckUI mode.
     # e.g. "steam://shortpowerpress" only works in DeckUI.
@@ -348,4 +356,123 @@ def is_process_running(name) -> bool:
         return True
     handycon.logger.debug(f'Process {name} is NOT running.')
     return False
+
+class turbo_handler:
+    DEFAULT_CONFIG = {
+            "capture": True,
+            # Default emulates existing TOGGLE_PERFORMANCE Behaviour
+            "speeds" : { # Only used for toggle mode.  Will start at default, and step through the numbered keys, in order.
+                0: {
+                    "command": [
+                        "ryzenadj --power-saving",
+                        "cpupower frequency-set -g powersave",
+                    ],
+                    "feedback": [
+                        "export XDG_RUNTIME_DIR=/run/user/1000",
+                        "pw-play /usr/share/notifications/power-saving.ogg",
+                    ],
+                    "rumble": 1,
+                    "default" : True,
+                },
+                1: {
+                    "command": [
+                        "ryzenadj --max-performance",
+                        "cpupower frequency-set -g performance",
+                    ],
+                    "feedback": [
+                        "export XDG_RUNTIME_DIR=/run/user/1000",
+                        "pw-play /usr/share/notifications/max-performance.ogg",
+                    ],
+                    "rumble": 2,
+                    "default" : True,
+                },
+            }}
+
+    IGNORE_MODE = "ignore"
+    KEY_MODE = "key"
+    TOGGLE_MODE = "toggle"
+
+
+    def __init__(self, config:Optional[dict]):
+        self.enabled = False
+        self.config = config if not None else self.DEFAULT_CONFIG
+
+        # Get all the speeds and remove the default indicator.
+        self.default = 0
+        self.speeds = sorted(self.config.get("speeds",{}).keys())
+        # Find the default speed, or just set to the first.
+        for speed in speeds:
+            if speed.get("default",False):
+                self.default = speed
+                break
+
+    def get_default_config(self) -> dict:
+        cfg = self.DEFAULT_CONFIG
+
+        # Override defaults for Powersave and Performance if we know a better set for a particular device.
+        try:
+            cfg["speeds"][0][command] = handycon.system_handler.get_powersave_config()
+            cfg["speeds"][1][command] = handycon.system_handler.get_performance_config()
+
+        except Exception:
+            # Ignore if this fails. It just means the module doesn't change the defaults.
+            pass
+
+        return cfg
+
+    def capture(self) -> bool:
+        # Do we want to capture the Turbo Key?
+        mode = self.config.get("capture",False)
+        return mode is True
+
+    def set_turbo(self):
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(self.toggle(0))
+
+    async def toggle(self, step = 1):
+        # Normally don't set step.  Its only purpose is to reuse logic at startup.
+        self.current += step
+
+        # Make sure the current speed is valid
+        current = self.current
+        if current > len(self.speeds):
+            current = 0
+        self.current = current
+
+        if current > len(self.speeds):
+            # Nothing to do, no speeds.
+            return
+
+        new_speed = self.config.get("speeds",{}).get(current,{})
+        command = new_speed.get("command",None)
+        if command is not None:
+            # Execute the speed setting command.
+            await run_async(command, 'Turbo Toggled with:')
+
+        feedback = new_speed.get("feedback",None)
+        if feedback is not None:
+            # execute the feedback command.
+            await run_async(feedback, 'Turbo Feedback with:')
+
+        rumble = new_speed.get("rumble",None)
+        if rumble is not None:
+            # execute the rumble command.
+            while rumble > 0:
+                await devices.do_rumble(0, 100, 100, 0)
+                await asyncio.sleep(FF_DELAY)
+
+
+async def run_async(cmd: list[str] | str, prompt="Ran external command:"):
+    if isinstance(cmd, list):
+        # Turn an array of commands into a single command with `;` between them,
+        # so they can be executed in a single call.
+        cmd = " ; ".join(cmd)
+
+    proc = await asyncio.create_subprocess_shell(
+        cmd,
+        stdout=asyncio.subprocess.PIPE,
+        stderr= asyncio.subprocess.STDOUT)
+    stdout, _ = await proc.communicate()
+    rc = proc.returncode
+    handycon.logger.info(f'{prompt} {cmd} : {rc} : {stdout}')
 

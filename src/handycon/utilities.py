@@ -393,7 +393,7 @@ class turbo_handler:
     TOGGLE_MODE = "toggle"
 
 
-    def __init__(self, config:Optional[dict]):
+    def __init__(self, config:dict|None):
         self.enabled = False
         self.config = config if not None else self.DEFAULT_CONFIG
 
